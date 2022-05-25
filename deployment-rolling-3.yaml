@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deploy-3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: test-app
+  template:
+    #Dichiarazione POD
+    metadata:
+      labels:
+        app: test-app #Deve matchare il matchLabels
+    spec:
+      #Dichiarazioni specifiche container
+      containers:
+      - name: nginx
+        image: nginx:1.14.2
+        ports:
+        - containerPort: 80
+        #Specifico il montaggio di un nuovo volume
+        volumeMounts:
+        - name: config
+          mountPath: /config.yaml
+          subPath: config.yaml  #Deve corrispondere al nome scritto in data nella configurazione della configmap (file secretAndConfig.yaml)
+        #Inserisco una variable d'ambiente sul container, recuperandola da Secret
+        env:
+        - name: variabile_segreta
+          valueFrom:
+            secretKeyRef:
+              name: super-secret
+              key: user    
+      #Collego una config map al mio POD
+      volumes:
+        - name: config
+          configMap:
+            name: super-config-map
+
+

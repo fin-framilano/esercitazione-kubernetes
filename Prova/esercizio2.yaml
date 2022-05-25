@@ -1,0 +1,52 @@
+# ES2
+
+# Tre repliche di andreabenfattifincons/python-todo con una env DATABASE postgres://postgres:PASSWORD_PRIMO_ESERCIZIO@NOME_SERVIZIO_1:5432
+
+---
+
+
+# DEPLOY
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: esercizio2
+  annotations:
+    kubernetes.io/change-cause: "Second try"
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: esercizio2-pod
+  template:
+    #Dichiarazione POD
+    metadata:
+      labels:
+        app: esercizio2-pod
+    spec:
+      containers:
+      - name: andrea-image
+        image: andreabenfattifincons/python-todo
+        ports:
+        - containerPort: 5000
+        env:
+        - name: DATABASE
+          value: postgres://postgres:francesco@my-service:5432
+
+---
+
+# SERVICE
+apiVersion: v1
+kind: Service
+metadata:
+  name: todo-dvc
+spec: 
+  type: ClusterIP
+  selector:
+    app: esercizio2-pod
+  ports:
+    - protocol: TCP
+      port: 5000
+      targetPort: 5000
+
+

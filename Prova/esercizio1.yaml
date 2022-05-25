@@ -1,0 +1,67 @@
+# ES1
+
+# DATABASE: Deployment con 1 replica, immagina postgres: 9.6, esponendo porta 5432
+# SECRET Una secret chiamata secret1 che contiene la password del DB da inserire in una env POSTGRES_PASSWORD
+
+# Secret
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: esercizio1-secret
+data:
+  postgres-password: ZnJhbmNlc2Nv
+
+---
+
+
+# DEPLOY
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: esercizio1
+  annotations:
+    kubernetes.io/change-cause: "First try"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: esercizio1-pod
+  template:
+    #Dichiarazione POD
+    metadata:
+      labels:
+        app: esercizio1-pod #Deve matchare il matchLabels
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:9.6
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: esercizio1-secret
+              key: postgres-password  
+
+---
+
+
+# SERVICE
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-service
+spec: 
+  type: ClusterIP
+  selector:
+    #selezionare i pod creati dal DB
+    app: esercizio1-pod
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
+
+

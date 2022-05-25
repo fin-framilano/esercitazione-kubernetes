@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deploy-1
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: test-app
+  template:
+    #Dichiarazione POD
+    metadata:
+      labels:
+        app: test-app #Deve matchare il matchLabels
+    spec:
+      #Dichiarazioni specifiche container
+      containers:
+      - name: nginx
+        image: nginx:1.14.2
+        ports:
+        - containerPort: 80
+
+
+# Deploy di 4 Pod con all'interno ciascuno un container nginx
